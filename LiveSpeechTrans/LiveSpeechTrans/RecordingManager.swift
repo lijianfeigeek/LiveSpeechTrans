@@ -5,24 +5,18 @@ import Speech
 
 class RecordingManager: ObservableObject {
     private var audioEngine: AVAudioEngine?
-    private var inputNode: AVAudioInputNode?
-    private var audioPlayer: AVAudioPlayer?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var speechRecognizer: SFSpeechRecognizer?
     
     @Published var isRecording = false
     @Published var recordedText = ""
-    @Published var recordedSentences: [String] = []
-    private var currentSentence = ""
-    private let punctuationMarks = [".", "!", "?", "。", "！", "？"]
-    
+    @Published var finalText = ""
     @Published var errorMessage: String?
-    @Published var currentLanguage: String = "en-US" {
-        didSet {
-            updateSpeechRecognizer()
-        }
-    }
+    
+    private var lastProcessedText = ""
+    private var silenceTimer: Timer?
+    private let silenceThreshold = 1.0
     
     init() {
         setupAudioSession()
@@ -31,7 +25,7 @@ class RecordingManager: ObservableObject {
     }
     
     private func setupAudioSession() {
-        // setupAudioSession remains the same
+        // 设置音频会话
     }
     
     private func requestSpeechAuthorization() {
@@ -41,22 +35,22 @@ class RecordingManager: ObservableObject {
                 case .authorized:
                     self.errorMessage = nil
                 case .denied:
-                    self.errorMessage = "Speech recognition permission denied. Please enable it in Settings."
+                    self.errorMessage = "Speech recognition permission denied."
                 case .restricted:
-                    self.errorMessage = "Speech recognition is restricted on this device."
+                    self.errorMessage = "Speech recognition is restricted."
                 case .notDetermined:
                     self.errorMessage = "Speech recognition not yet authorized."
                 @unknown default:
-                    self.errorMessage = "Unknown authorization status for speech recognition."
+                    self.errorMessage = "Unknown authorization status."
                 }
             }
         }
     }
     
     private func updateSpeechRecognizer() {
-        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: currentLanguage))
+        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
         if speechRecognizer == nil {
-            errorMessage = "Speech recognition not available for \(currentLanguage)"
+            errorMessage = "Speech recognition not available for the current language."
         } else {
             errorMessage = nil
         }
@@ -65,18 +59,23 @@ class RecordingManager: ObservableObject {
     func startRecording() {
         guard !isRecording else { return }
         guard SFSpeechRecognizer.authorizationStatus() == .authorized else {
-            errorMessage = "Speech recognition not authorized. Please check app permissions in Settings."
+            errorMessage = "Speech recognition not authorized."
             return
         }
+        
+        recordedText = ""
+        finalText = ""
+        lastProcessedText = ""
         
         audioEngine = AVAudioEngine()
         guard let audioEngine = audioEngine else { return }
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         guard let recognitionRequest = recognitionRequest else {
-            errorMessage = "Unable to create speech recognition request"
+            errorMessage = "Unable to create recognition request."
             return
         }
+        
         recognitionRequest.shouldReportPartialResults = true
         
         do {
@@ -89,30 +88,51 @@ class RecordingManager: ObservableObject {
             audioEngine.prepare()
             try audioEngine.start()
             
+            print("Recording started")
+            
             recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { [weak self] result, error in
                 guard let self = self else { return }
+                
                 if let result = result {
-                    let newText = result.bestTranscription.formattedString
-                    if newText != self.recordedText {
-                        self.recordedText = newText
-                        self.processSentence(newText)
-                        print("New recorded text: \(newText)")
+                    let transcription = result.bestTranscription.formattedString
+                    
+                    DispatchQueue.main.async {
+                        self.recordedText = transcription
+                        print("Partial result: \(transcription)")
+                        
+                        self.silenceTimer?.invalidate()
+                        
+                        if transcription != self.lastProcessedText {
+                            self.silenceTimer = Timer.scheduledTimer(withTimeInterval: self.silenceThreshold, repeats: false) { _ in
+                                if !transcription.isEmpty && transcription != self.lastProcessedText {
+                                    self.finalText = transcription
+                                    print("Final result: \(transcription)")
+                                    self.lastProcessedText = transcription
+                                    self.recordedText = ""
+                                }
+                            }
+                        }
                     }
                 }
+                
                 if let error = error {
-                    self.stopRecording()
-                    self.errorMessage = "Recognition task error: \(error.localizedDescription)"
+                    self.errorMessage = "Recognition error: \(error.localizedDescription)"
                     print("Recognition error: \(error.localizedDescription)")
                 }
             }
             
             isRecording = true
+            
         } catch {
             errorMessage = "Failed to start audio engine: \(error.localizedDescription)"
+            print("Audio engine start error: \(error.localizedDescription)")
         }
     }
     
     func stopRecording() {
+        silenceTimer?.invalidate()
+        silenceTimer = nil
+        
         audioEngine?.stop()
         audioEngine?.inputNode.removeTap(onBus: 0)
         recognitionRequest?.endAudio()
@@ -121,18 +141,7 @@ class RecordingManager: ObservableObject {
         isRecording = false
         recognitionRequest = nil
         recognitionTask = nil
-    }
-    
-    private func processSentence(_ text: String) {
-        let words = text.components(separatedBy: .whitespacesAndNewlines)
-        for word in words {
-            currentSentence += word + " "
-            if punctuationMarks.contains(where: { word.hasSuffix($0) }) {
-                let newSentence = currentSentence.trimmingCharacters(in: .whitespaces)
-                recordedSentences.append(newSentence)
-                print("New sentence added: \(newSentence)")
-                currentSentence = ""
-            }
-        }
+        
+        print("Recording stopped")
     }
 }

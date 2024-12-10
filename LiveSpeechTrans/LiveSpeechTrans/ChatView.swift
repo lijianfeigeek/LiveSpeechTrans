@@ -5,6 +5,7 @@ struct ChatMessage: Identifiable, Equatable {
     let text: String
     let translation: String
     let isUser: Bool
+    let timestamp: Date
     
     static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
         return lhs.id == rhs.id
@@ -45,10 +46,15 @@ struct ChatView: View {
             RecordingButton(recordingManager: recordingManager)
                 .padding(.bottom, 20)
         }
-        .onReceive(recordingManager.$recordedText) { newText in
-            print("Received new text: \(newText)")
+        .onReceive(recordingManager.$finalText) { newText in
+            print("Received final text: \(newText)")
             if !newText.isEmpty {
-                let newMessage = ChatMessage(text: newText, translation: "", isUser: true)
+                let newMessage = ChatMessage(
+                    text: newText, 
+                    translation: "", 
+                    isUser: true,
+                    timestamp: Date()
+                )
                 messages.append(newMessage)
                 openAIManager.translate(text: newText, from: "English", to: "Chinese")
             }
@@ -56,7 +62,12 @@ struct ChatView: View {
         .onReceive(openAIManager.$translation) { translation in
             print("Received translation: \(translation)")
             if let lastMessage = messages.last, lastMessage.isUser {
-                let updatedMessage = ChatMessage(text: lastMessage.text, translation: translation, isUser: true)
+                let updatedMessage = ChatMessage(
+                    text: lastMessage.text, 
+                    translation: translation, 
+                    isUser: true,
+                    timestamp: lastMessage.timestamp
+                )
                 messages[messages.count - 1] = updatedMessage
             }
         }
@@ -66,8 +77,20 @@ struct ChatView: View {
 struct MessageBubble: View {
     let message: ChatMessage
     
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "zh_CN")
+        return formatter
+    }()
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
+            Text(dateFormatter.string(from: message.timestamp))
+                .font(.caption2)
+                .foregroundColor(.gray)
+                .padding(.horizontal, 8)
+            
             Text(message.text)
                 .padding(10)
                 .background(Color.blue.opacity(0.2))
