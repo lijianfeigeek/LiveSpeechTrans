@@ -9,27 +9,14 @@ import SwiftUI
 import AVFoundation
 
 struct ContentView: View {
-    @State private var selectedTab = 0
-    
     var body: some View {
-        TabView(selection: $selectedTab) {
-            RecordingView()
-                .tabItem {
-                    Label("Record", systemImage: "mic")
-                }
-                .tag(0)
-            
-            TranslationView()
-                .tabItem {
-                    Label("Translate", systemImage: "globe")
-                }
-                .tag(1)
-        }
+        RecordingView()
     }
 }
 
 struct RecordingView: View {
     @StateObject private var recordingManager = RecordingManager()
+    @StateObject private var openAIManager = OpenAIManager(apiKey: "YOUR_API_KEY_HERE")
     
     var body: some View {
         VStack {
@@ -50,64 +37,26 @@ struct RecordingView: View {
                     .foregroundColor(recordingManager.isRecording ? .red : .blue)
             }
             
+            Text("Recognized Text:")
+                .font(.headline)
+                .padding(.top)
             Text(recordingManager.recordedText)
                 .padding()
             
-            if let errorMessage = recordingManager.errorMessage {
+            Text("Translated Text:")
+                .font(.headline)
+                .padding(.top)
+            Text(openAIManager.translation)
+                .padding()
+            
+            if let errorMessage = recordingManager.errorMessage ?? openAIManager.errorMessage {
                 Text(errorMessage)
                     .foregroundColor(.red)
                     .padding()
             }
         }
-    }
-}
-
-struct TranslationView: View {
-    @StateObject private var openAIManager = OpenAIManager(apiKey: "YOUR_API_KEY_HERE")
-    @State private var sourceText = ""
-    @State private var sourceLanguage = "English"
-    @State private var targetLanguage = "Chinese"
-    
-    var body: some View {
-        VStack {
-            TextField("Enter text to translate", text: $sourceText)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            HStack {
-                Picker("From", selection: $sourceLanguage) {
-                    Text("English").tag("English")
-                    Text("Chinese").tag("Chinese")
-                }
-                
-                Picker("To", selection: $targetLanguage) {
-                    Text("English").tag("English")
-                    Text("Chinese").tag("Chinese")
-                }
-            }
-            .padding()
-            
-            Button(action: {
-                openAIManager.translate(text: sourceText, from: sourceLanguage, to: targetLanguage)
-            }) {
-                Text("Translate")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
-            .disabled(openAIManager.isLoading)
-            
-            if openAIManager.isLoading {
-                ProgressView()
-            } else if let errorMessage = openAIManager.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .padding()
-            } else {
-                Text(openAIManager.translation)
-                    .padding()
-            }
+        .onChange(of: recordingManager.recordedText) { newValue in
+            openAIManager.translate(text: newValue, from: "English", to: "Chinese")
         }
     }
 }

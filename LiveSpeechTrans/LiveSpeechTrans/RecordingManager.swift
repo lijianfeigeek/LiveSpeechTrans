@@ -88,7 +88,10 @@ class RecordingManager: ObservableObject {
             recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { [weak self] result, error in
                 guard let self = self else { return }
                 if let result = result {
-                    self.recordedText = result.bestTranscription.formattedString
+                    let newText = result.bestTranscription.formattedString
+                    if newText != self.recordedText {
+                        self.recordedText = newText
+                    }
                 }
                 if error != nil {
                     self.stopRecording()
