@@ -21,7 +21,7 @@ struct ChatView: View {
     private let speechSynthesizer = AVSpeechSynthesizer()
 
     private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
-        if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.speech.synthesis.voice.Fred") {
+        if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
             return fredVoice
         }
         
@@ -79,7 +79,7 @@ struct ChatView: View {
                     timestamp: lastMessage.timestamp
                 )
                 messages[messages.count - 1] = updatedMessage
-                
+//                listAvailableVoices()
                 let utterance = AVSpeechUtterance(string: translation)
                 if let preferredVoice = getPreferredVoice() {
                     utterance.voice = preferredVoice
