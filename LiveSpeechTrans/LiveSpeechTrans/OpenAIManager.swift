@@ -16,6 +16,11 @@ class OpenAIManager: ObservableObject {
     }
     
     func translate(text: String, from: String, to: String) {
+        guard !text.isEmpty else {
+            self.translation = ""
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
         
@@ -58,6 +63,7 @@ class OpenAIManager: ObservableObject {
                 if let error = error {
                     self?.errorMessage = "Network error: \(error.localizedDescription)"
                     os_log("Network error: %{public}@", log: self?.logger ?? .default, type: .error, error.localizedDescription)
+                    print("Translation network error: \(error.localizedDescription)")
                     return
                 }
                 
@@ -79,13 +85,16 @@ class OpenAIManager: ObservableObject {
                        let content = message["content"] as? String {
                         self?.translation = content.trimmingCharacters(in: .whitespacesAndNewlines)
                         os_log("Translation successful", log: self?.logger ?? .default, type: .debug)
+                        print("Translation successful: \(content)")
                     } else {
                         self?.errorMessage = "Failed to parse response"
                         os_log("Failed to parse response", log: self?.logger ?? .default, type: .error)
+                        print("Failed to parse translation response")
                     }
                 } catch {
                     self?.errorMessage = "Decoding error: \(error.localizedDescription)"
                     os_log("Decoding error: %{public}@", log: self?.logger ?? .default, type: .error, error.localizedDescription)
+                    print("Translation decoding error: \(error.localizedDescription)")
                 }
             }
         }.resume()

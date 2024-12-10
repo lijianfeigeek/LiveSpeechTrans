@@ -13,6 +13,10 @@ class RecordingManager: ObservableObject {
     
     @Published var isRecording = false
     @Published var recordedText = ""
+    @Published var recordedSentences: [String] = []
+    private var currentSentence = ""
+    private let punctuationMarks = [".", "!", "?", "。", "！", "？"]
+    
     @Published var errorMessage: String?
     @Published var currentLanguage: String = "en-US" {
         didSet {
@@ -91,11 +95,14 @@ class RecordingManager: ObservableObject {
                     let newText = result.bestTranscription.formattedString
                     if newText != self.recordedText {
                         self.recordedText = newText
+                        self.processSentence(newText)
+                        print("New recorded text: \(newText)")
                     }
                 }
-                if error != nil {
+                if let error = error {
                     self.stopRecording()
-                    self.errorMessage = "Recognition task error: \(error?.localizedDescription ?? "")"
+                    self.errorMessage = "Recognition task error: \(error.localizedDescription)"
+                    print("Recognition error: \(error.localizedDescription)")
                 }
             }
             
@@ -114,5 +121,18 @@ class RecordingManager: ObservableObject {
         isRecording = false
         recognitionRequest = nil
         recognitionTask = nil
+    }
+    
+    private func processSentence(_ text: String) {
+        let words = text.components(separatedBy: .whitespacesAndNewlines)
+        for word in words {
+            currentSentence += word + " "
+            if punctuationMarks.contains(where: { word.hasSuffix($0) }) {
+                let newSentence = currentSentence.trimmingCharacters(in: .whitespaces)
+                recordedSentences.append(newSentence)
+                print("New sentence added: \(newSentence)")
+                currentSentence = ""
+            }
+        }
     }
 }
