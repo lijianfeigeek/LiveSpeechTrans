@@ -13,7 +13,6 @@ struct ContentView: View {
     @StateObject private var openAIManager = OpenAIManager(apiKey: "YOUR_API_KEY_HERE")
     var body: some View {
         ChatView(recordingManager: recordingManager, openAIManager: openAIManager)
-
     }
 }
 
