@@ -15,33 +15,37 @@ struct ChatView: View {
     @ObservedObject var recordingManager: RecordingManager
     @ObservedObject var openAIManager: OpenAIManager
     @State private var messages: [ChatMessage] = []
-    @State private var scrollProxy: ScrollViewProxy? = nil
+    @State private var scrollToBottom = false
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(messages) { message in
                             MessageBubble(message: message)
+                                .id(message.id)
                         }
                     }
                     .padding()
                 }
                 .onChange(of: messages) { _ in
-                    withAnimation {
-                        proxy.scrollTo(messages.last?.id, anchor: .bottom)
-                    }
+                    scrollToBottom = true
                 }
-                .onAppear {
-                    scrollProxy = proxy
+                .onChange(of: scrollToBottom) { _ in
+                    if scrollToBottom {
+                        withAnimation {
+                            proxy.scrollTo(messages.last?.id, anchor: .bottom)
+                        }
+                        scrollToBottom = false
+                    }
                 }
             }
 
             RecordingButton(recordingManager: recordingManager)
+                .padding(.bottom, 20)
         }
-        .background(Color.primary.opacity(0.1))
-
+        
         .onReceive(recordingManager.$recordedText) { newText in
             print("Received new text: \(newText)")
             if !newText.isEmpty {
@@ -64,11 +68,11 @@ struct MessageBubble: View {
     let message: ChatMessage
     
     var body: some View {
-        VStack(alignment: message.isUser ? .trailing : .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(message.text)
                 .padding(10)
-                .background(message.isUser ? Color.blue : Color.secondary.opacity(0.2))
-                .foregroundColor(message.isUser ? .white : .primary)
+                .background(Color.blue.opacity(0.2))
+                .foregroundColor(.primary)
                 .cornerRadius(16)
             
             if !message.translation.isEmpty {
@@ -78,7 +82,7 @@ struct MessageBubble: View {
                     .padding(.horizontal, 8)
             }
         }
-        .frame(maxWidth: .infinity, alignment: message.isUser ? .trailing : .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -93,15 +97,23 @@ struct RecordingButton: View {
                 recordingManager.startRecording()
             }
         }) {
-            Image(systemName: recordingManager.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 60, height: 60)
-                .foregroundColor(recordingManager.isRecording ? .red : .blue)
-                .background(Color.primary.opacity(0.1))
-                .clipShape(Circle())
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            ZStack {
+                Circle()
+                    .fill(recordingManager.isRecording ? Color.red : Color.blue)
+                    .frame(width: 70, height: 70)
+                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+                
+                Image(systemName: recordingManager.isRecording ? "stop.fill" : "mic.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.white)
+            }
+            .overlay(
+                Circle()
+                    .stroke(Color.white, lineWidth: 4)
+                    .frame(width: 74, height: 74)
+            )
         }
-        .padding()
     }
 }
