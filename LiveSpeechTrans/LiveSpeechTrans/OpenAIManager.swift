@@ -28,7 +28,7 @@ class OpenAIManager: ObservableObject {
         let body: [String: Any] = [
             "model": "gemma-2-27b-it",
             "messages": [
-                ["role": "system", "content": "You are a helpful assistant that translates text."],
+                ["role": "system", "content": "You are a helpful assistant that translates text.Translate directly, don't add any of your own words."],
                 ["role": "user", "content": prompt]
             ]
         ]

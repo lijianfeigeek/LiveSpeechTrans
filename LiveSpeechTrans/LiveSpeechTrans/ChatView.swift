@@ -18,7 +18,7 @@ struct ChatView: View {
     @State private var scrollToBottom = false
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        VStack(spacing: 0) {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -45,7 +45,6 @@ struct ChatView: View {
             RecordingButton(recordingManager: recordingManager)
                 .padding(.bottom, 20)
         }
-        
         .onReceive(recordingManager.$recordedText) { newText in
             print("Received new text: \(newText)")
             if !newText.isEmpty {
