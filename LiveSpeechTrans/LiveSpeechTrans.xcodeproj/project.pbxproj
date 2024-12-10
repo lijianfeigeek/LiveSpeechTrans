@@ -7,19 +7,32 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		590905BE2D07D957005C12AA /* LiveSpeechTrans.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiveSpeechTrans.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5993874F2D06C801005B460B /* LiveSpeechTrans.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiveSpeechTrans.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		599387682D06CE47005B460B /* Exceptions for "LiveSpeechTrans" folder in "LiveSpeechTrans" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5993874E2D06C801005B460B /* LiveSpeechTrans */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		590905C02D07D957005C12AA /* LiveSpeechTrans */ = {
+		599387512D06C801005B460B /* LiveSpeechTrans */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				599387682D06CE47005B460B /* Exceptions for "LiveSpeechTrans" folder in "LiveSpeechTrans" target */,
+			);
 			path = LiveSpeechTrans;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		590905BB2D07D957005C12AA /* Frameworks */ = {
+		5993874C2D06C801005B460B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -29,18 +42,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		590905B52D07D957005C12AA = {
+		599387462D06C801005B460B = {
 			isa = PBXGroup;
 			children = (
-				590905C02D07D957005C12AA /* LiveSpeechTrans */,
-				590905BF2D07D957005C12AA /* Products */,
+				599387512D06C801005B460B /* LiveSpeechTrans */,
+				599387502D06C801005B460B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		590905BF2D07D957005C12AA /* Products */ = {
+		599387502D06C801005B460B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				590905BE2D07D957005C12AA /* LiveSpeechTrans.app */,
+				5993874F2D06C801005B460B /* LiveSpeechTrans.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,64 +61,64 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		590905BD2D07D957005C12AA /* LiveSpeechTrans */ = {
+		5993874E2D06C801005B460B /* LiveSpeechTrans */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 590905CD2D07D959005C12AA /* Build configuration list for PBXNativeTarget "LiveSpeechTrans" */;
+			buildConfigurationList = 5993875E2D06C802005B460B /* Build configuration list for PBXNativeTarget "LiveSpeechTrans" */;
 			buildPhases = (
-				590905BA2D07D957005C12AA /* Sources */,
-				590905BB2D07D957005C12AA /* Frameworks */,
-				590905BC2D07D957005C12AA /* Resources */,
+				5993874B2D06C801005B460B /* Sources */,
+				5993874C2D06C801005B460B /* Frameworks */,
+				5993874D2D06C801005B460B /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				590905C02D07D957005C12AA /* LiveSpeechTrans */,
+				599387512D06C801005B460B /* LiveSpeechTrans */,
 			);
 			name = LiveSpeechTrans;
 			packageProductDependencies = (
 			);
 			productName = LiveSpeechTrans;
-			productReference = 590905BE2D07D957005C12AA /* LiveSpeechTrans.app */;
+			productReference = 5993874F2D06C801005B460B /* LiveSpeechTrans.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		590905B62D07D957005C12AA /* Project object */ = {
+		599387472D06C801005B460B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					590905BD2D07D957005C12AA = {
+					5993874E2D06C801005B460B = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
 			};
-			buildConfigurationList = 590905B92D07D957005C12AA /* Build configuration list for PBXProject "LiveSpeechTrans" */;
+			buildConfigurationList = 5993874A2D06C801005B460B /* Build configuration list for PBXProject "LiveSpeechTrans" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 590905B52D07D957005C12AA;
+			mainGroup = 599387462D06C801005B460B;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 590905BF2D07D957005C12AA /* Products */;
+			productRefGroup = 599387502D06C801005B460B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				590905BD2D07D957005C12AA /* LiveSpeechTrans */,
+				5993874E2D06C801005B460B /* LiveSpeechTrans */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		590905BC2D07D957005C12AA /* Resources */ = {
+		5993874D2D06C801005B460B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -115,7 +128,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		590905BA2D07D957005C12AA /* Sources */ = {
+		5993874B2D06C801005B460B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -125,7 +138,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		590905CB2D07D959005C12AA /* Debug */ = {
+		5993875C2D06C802005B460B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -188,7 +201,7 @@
 			};
 			name = Debug;
 		};
-		590905CC2D07D959005C12AA /* Release */ = {
+		5993875D2D06C802005B460B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -243,7 +256,7 @@
 			};
 			name = Release;
 		};
-		590905CE2D07D959005C12AA /* Debug */ = {
+		5993875F2D06C802005B460B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -257,7 +270,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LiveSpeechTrans/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need access to your microphone for speech recognition and translation.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -270,7 +286,7 @@
 			};
 			name = Debug;
 		};
-		590905CF2D07D959005C12AA /* Release */ = {
+		599387602D06C802005B460B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -284,7 +300,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LiveSpeechTrans/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need access to your microphone for speech recognition and translation.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -300,25 +319,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		590905B92D07D957005C12AA /* Build configuration list for PBXProject "LiveSpeechTrans" */ = {
+		5993874A2D06C801005B460B /* Build configuration list for PBXProject "LiveSpeechTrans" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				590905CB2D07D959005C12AA /* Debug */,
-				590905CC2D07D959005C12AA /* Release */,
+				5993875C2D06C802005B460B /* Debug */,
+				5993875D2D06C802005B460B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		590905CD2D07D959005C12AA /* Build configuration list for PBXNativeTarget "LiveSpeechTrans" */ = {
+		5993875E2D06C802005B460B /* Build configuration list for PBXNativeTarget "LiveSpeechTrans" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				590905CE2D07D959005C12AA /* Debug */,
-				590905CF2D07D959005C12AA /* Release */,
+				5993875F2D06C802005B460B /* Debug */,
+				599387602D06C802005B460B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 590905B62D07D957005C12AA /* Project object */;
+	rootObject = 599387472D06C801005B460B /* Project object */;
 }

@@ -2,7 +2,7 @@
 //  LiveSpeechTransApp.swift
 //  LiveSpeechTrans
 //
-//  Created by LIJIANFEI on 10/12/24.
+//  Created by LIJIANFEI on 9/12/24.
 //
 
 import SwiftUI
