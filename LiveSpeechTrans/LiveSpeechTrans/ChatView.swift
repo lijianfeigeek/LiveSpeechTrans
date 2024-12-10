@@ -56,6 +56,9 @@ struct ChatView: View {
             RecordingButton(recordingManager: recordingManager)
                 .padding(.bottom, 20)
         }
+        .onAppear {
+            checkVoiceAvailability()
+        }
         .onReceive(recordingManager.$finalText) { newText in
             print("Received final text: \(newText)")
             if !newText.isEmpty {
@@ -104,6 +107,26 @@ extension ChatView {
         print("Available voices:")
         for voice in voices {
             print("- \(voice.identifier): \(voice.language)")
+        }
+    }
+
+    func checkVoiceAvailability() {
+        // Check for premium voice
+        if let premiumVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
+            print("Premium voice is available: \(premiumVoice.identifier)")
+            print("Quality: \(premiumVoice.quality.rawValue)")
+        } else {
+            print("Premium voice is not available")
+        }
+        
+        // List all available voices
+        let voices = AVSpeechSynthesisVoice.speechVoices()
+        print("\nAll available voices:")
+        for voice in voices {
+            print("ID: \(voice.identifier)")
+            print("Language: \(voice.language)")
+            print("Quality: \(voice.quality.rawValue)")
+            print("---")
         }
     }
 }
