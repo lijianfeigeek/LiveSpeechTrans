@@ -83,9 +83,9 @@ struct ChatView: View {
                 let utterance = AVSpeechUtterance(string: translation)
                 if let preferredVoice = getPreferredVoice() {
                     utterance.voice = preferredVoice
-                    utterance.rate = 0.5
-                    utterance.pitchMultiplier = 1.0
-                    utterance.volume = 1.0
+//                    utterance.rate = 0.5
+//                    utterance.pitchMultiplier = 1.0
+//                    utterance.volume = 1.0
                     
                     print("Using voice: \(preferredVoice.identifier)")
                     speechSynthesizer.speak(utterance)
