@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct ChatMessage: Identifiable, Equatable {
     let id = UUID()
@@ -17,6 +18,15 @@ struct ChatView: View {
     @ObservedObject var openAIManager: OpenAIManager
     @State private var messages: [ChatMessage] = []
     @State private var scrollToBottom = false
+    private let speechSynthesizer = AVSpeechSynthesizer()
+
+    private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
+        if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.speech.synthesis.voice.Fred") {
+            return fredVoice
+        }
+        
+        return AVSpeechSynthesisVoice(language: "en-US")
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -69,10 +79,35 @@ struct ChatView: View {
                     timestamp: lastMessage.timestamp
                 )
                 messages[messages.count - 1] = updatedMessage
+                
+                let utterance = AVSpeechUtterance(string: translation)
+                if let preferredVoice = getPreferredVoice() {
+                    utterance.voice = preferredVoice
+                    utterance.rate = 0.5
+                    utterance.pitchMultiplier = 1.0
+                    utterance.volume = 1.0
+                    
+                    print("Using voice: \(preferredVoice.identifier)")
+                    speechSynthesizer.speak(utterance)
+                } else {
+                    print("No suitable voice found")
+                }
             }
         }
     }
 }
+
+#if DEBUG
+extension ChatView {
+    private func listAvailableVoices() {
+        let voices = AVSpeechSynthesisVoice.speechVoices()
+        print("Available voices:")
+        for voice in voices {
+            print("- \(voice.identifier): \(voice.language)")
+        }
+    }
+}
+#endif
 
 struct MessageBubble: View {
     let message: ChatMessage
