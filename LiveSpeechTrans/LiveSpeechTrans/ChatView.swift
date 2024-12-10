@@ -56,7 +56,7 @@ struct ChatView: View {
                     timestamp: Date()
                 )
                 messages.append(newMessage)
-                openAIManager.translate(text: newText, from: "English", to: "Chinese")
+                openAIManager.translate(text: newText, from: "Chinese", to: "English")
             }
         }
         .onReceive(openAIManager.$translation) { translation in
