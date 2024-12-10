@@ -3,7 +3,7 @@ import os.log
 
 class OpenAIManager: ObservableObject {
     private let apiKey: String
-    private let baseURL = "http://localhost:1234/v1/chat/completions"
+    private let baseURL = "http://192.168.0.111:1234/v1/chat/completions"
     
     @Published var translation: String = ""
     @Published var isLoading: Bool = false
