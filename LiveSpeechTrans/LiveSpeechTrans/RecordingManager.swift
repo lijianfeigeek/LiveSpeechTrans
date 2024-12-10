@@ -14,9 +14,11 @@ class RecordingManager: ObservableObject {
     @Published var finalText = ""
     @Published var errorMessage: String?
     
-    private var lastProcessedText = ""
+    // 音量监测相关
     private var silenceTimer: Timer?
-    private let silenceThreshold = 1.0
+    private let silenceThreshold: Float = 0.05  // 音量阈值
+    private let silenceDuration: TimeInterval = 1.5  // 停顿持续时间（秒）
+    private var lastAudioLevel: Float = 0
     
     init() {
         setupAudioSession()
@@ -48,9 +50,10 @@ class RecordingManager: ObservableObject {
     }
     
     private func updateSpeechRecognizer() {
-        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+        // 设置为中文识别
+        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "zh-CN"))
         if speechRecognizer == nil {
-            errorMessage = "Speech recognition not available for the current language."
+            errorMessage = "Speech recognition not available for Chinese."
         } else {
             errorMessage = nil
         }
@@ -65,8 +68,11 @@ class RecordingManager: ObservableObject {
         
         recordedText = ""
         finalText = ""
-        lastProcessedText = ""
         
+        startNewRecognition()
+    }
+    
+    private func startNewRecognition() {
         audioEngine = AVAudioEngine()
         guard let audioEngine = audioEngine else { return }
         
@@ -81,8 +87,37 @@ class RecordingManager: ObservableObject {
         do {
             let inputNode = audioEngine.inputNode
             let recordingFormat = inputNode.outputFormat(forBus: 0)
-            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] (buffer, _) in
-                self?.recognitionRequest?.append(buffer)
+            
+            // 安装音频监测
+            let documentPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let audioFilename = documentPath.appendingPathComponent("audio.caf")
+            
+            // 安装音频 tap 用于音量监测
+            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] (buffer, time) in
+                guard let self = self else { return }
+                self.recognitionRequest?.append(buffer)
+                
+                // 计算音量
+                let channelData = buffer.floatChannelData?[0]
+                let frames = buffer.frameLength
+                
+                var sum: Float = 0
+                for i in 0..<Int(frames) {
+                    sum += abs(channelData?[i] ?? 0)
+                }
+                
+                let average = sum / Float(frames)
+                self.lastAudioLevel = average
+                
+                // 检查音量是否低于阈值
+                DispatchQueue.main.async {
+                    if average < self.silenceThreshold {
+                        self.handleSilence()
+                    } else {
+                        self.silenceTimer?.invalidate()
+                        self.silenceTimer = nil
+                    }
+                }
             }
             
             audioEngine.prepare()
@@ -94,24 +129,9 @@ class RecordingManager: ObservableObject {
                 guard let self = self else { return }
                 
                 if let result = result {
-                    let transcription = result.bestTranscription.formattedString
-                    
                     DispatchQueue.main.async {
-                        self.recordedText = transcription
-                        print("Partial result: \(transcription)")
-                        
-                        self.silenceTimer?.invalidate()
-                        
-                        if transcription != self.lastProcessedText {
-                            self.silenceTimer = Timer.scheduledTimer(withTimeInterval: self.silenceThreshold, repeats: false) { _ in
-                                if !transcription.isEmpty && transcription != self.lastProcessedText {
-                                    self.finalText = transcription
-                                    print("Final result: \(transcription)")
-                                    self.lastProcessedText = transcription
-                                    self.recordedText = ""
-                                }
-                            }
-                        }
+                        self.recordedText = result.bestTranscription.formattedString
+                        print("Recognition result: \(self.recordedText)")
                     }
                 }
                 
@@ -127,6 +147,35 @@ class RecordingManager: ObservableObject {
             errorMessage = "Failed to start audio engine: \(error.localizedDescription)"
             print("Audio engine start error: \(error.localizedDescription)")
         }
+    }
+    
+    private func handleSilence() {
+        if silenceTimer == nil {
+            silenceTimer = Timer.scheduledTimer(withTimeInterval: silenceDuration, repeats: false) { [weak self] _ in
+                guard let self = self else { return }
+                
+                // 停顿时间达到阈值，结束当前识别
+                if !self.recordedText.isEmpty {
+                    self.finalText = self.recordedText
+                    print("Final result (silence detected): \(self.finalText)")
+                    self.recordedText = ""
+                }
+                
+                // 重新开始新的识别
+                self.restartRecognition()
+            }
+        }
+    }
+    
+    private func restartRecognition() {
+        // 停止当前识别
+        audioEngine?.stop()
+        audioEngine?.inputNode.removeTap(onBus: 0)
+        recognitionRequest?.endAudio()
+        recognitionTask?.cancel()
+        
+        // 开始新的识别
+        startNewRecognition()
     }
     
     func stopRecording() {
