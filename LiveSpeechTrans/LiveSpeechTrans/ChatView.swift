@@ -87,32 +87,26 @@ struct MessageBubble: View {
 
 struct RecordingButton: View {
     @ObservedObject var recordingManager: RecordingManager
+    @State private var isRecording = false
     
     var body: some View {
-        Button(action: {
-            if recordingManager.isRecording {
-                recordingManager.stopRecording()
-            } else {
-                recordingManager.startRecording()
-            }
-        }) {
-            ZStack {
-                Circle()
-                    .fill(recordingManager.isRecording ? Color.red : Color.blue)
-                    .frame(width: 70, height: 70)
-                    .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-                
-                Image(systemName: recordingManager.isRecording ? "stop.fill" : "mic.fill")
+        Circle()
+            .fill(isRecording ? Color.red : Color.blue)
+            .frame(width: 60, height: 60)
+            .overlay(
+                Image(systemName: isRecording ? "stop.fill" : "mic.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 24, height: 24)
                     .foregroundColor(.white)
-            }
-            .overlay(
-                Circle()
-                    .stroke(Color.white, lineWidth: 4)
-                    .frame(width: 74, height: 74)
             )
-        }
+            .onTapGesture {
+                isRecording.toggle()
+                if isRecording {
+                    recordingManager.startRecording()
+                } else {
+                    recordingManager.stopRecording()
+                }
+            }
     }
 }
