@@ -32,7 +32,7 @@ struct ChatView: View {
     }
     
     private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
-        if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
+        if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.enhanced.en-US.Evan") {
             return fredVoice
         }
         
@@ -113,21 +113,21 @@ struct ChatView: View {
 #if DEBUG
 extension ChatView {
     private func listAvailableVoices() {
-        let voices = AVSpeechSynthesisVoice.speechVoices()
-        print("Available voices:")
-        for voice in voices {
-            print("- \(voice.identifier): \(voice.language)")
-        }
+//        let voices = AVSpeechSynthesisVoice.speechVoices()
+//        print("Available voices:")
+//        for voice in voices {
+//            print("- \(voice.identifier): \(voice.language)")
+//        }
     }
 
     func checkVoiceAvailability() {
         // Check for premium voice
-        if let premiumVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
-            print("Premium voice is available: \(premiumVoice.identifier)")
-            print("Quality: \(premiumVoice.quality.rawValue)")
-        } else {
-            print("Premium voice is not available")
-        }
+//        if let premiumVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
+//            print("Premium voice is available: \(premiumVoice.identifier)")
+//            print("Quality: \(premiumVoice.quality.rawValue)")
+//        } else {
+//            print("Premium voice is not available")
+//        }
         
         // List all available voices
         let voices = AVSpeechSynthesisVoice.speechVoices()
