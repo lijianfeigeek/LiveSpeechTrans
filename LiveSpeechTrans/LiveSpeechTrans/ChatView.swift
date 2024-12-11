@@ -18,8 +18,19 @@ struct ChatView: View {
     @ObservedObject var openAIManager: OpenAIManager
     @State private var messages: [ChatMessage] = []
     @State private var scrollToBottom = false
-    private let speechSynthesizer = AVSpeechSynthesizer()
-
+    // Make synthesizer static to prevent deallocation
+    private static let speechSynthesizer = AVSpeechSynthesizer()
+    
+    // Add audio session configuration
+    private func configureAudioSession() {
+//        do {
+//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+//            try AVAudioSession.sharedInstance().setActive(true)
+//        } catch {
+//            print("Audio session configuration error: \(error)")
+//        }
+    }
+    
     private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
         if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
             return fredVoice
@@ -58,6 +69,7 @@ struct ChatView: View {
         }
         .onAppear {
             checkVoiceAvailability()
+            configureAudioSession()
         }
         .onReceive(recordingManager.$finalText) { newText in
             print("Received final text: \(newText)")
@@ -82,18 +94,16 @@ struct ChatView: View {
                     timestamp: lastMessage.timestamp
                 )
                 messages[messages.count - 1] = updatedMessage
-//                listAvailableVoices()
+                
                 let utterance = AVSpeechUtterance(string: translation)
                 if let preferredVoice = getPreferredVoice() {
                     utterance.voice = preferredVoice
-//                    utterance.rate = 0.5
-//                    utterance.pitchMultiplier = 1.0
-//                    utterance.volume = 1.0
+                    utterance.rate = 0.5  // 降低语速
+                    utterance.volume = 1.0 // 确保音量最大
                     
-                    print("Using voice: \(preferredVoice.identifier)")
-                    speechSynthesizer.speak(utterance)
-                } else {
-                    print("No suitable voice found")
+                    print("Starting speech synthesis...")
+                    Self.speechSynthesizer.speak(utterance)
+                    print("Speech synthesis initiated")
                 }
             }
         }
