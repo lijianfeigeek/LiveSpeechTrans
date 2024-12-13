@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/5684053c-2a14-4848-95d2-98aab379cd1f)
+
 # LiveSpeechTrans
 
    LiveSpeechTrans 是一个实时语音翻译应用，基于 SwiftUI 开发，支持实时语音识别和多语言翻译功能。
