@@ -29,7 +29,7 @@
 
    1. 克隆项目到本地：
    ```bash
-   git clone https://github.com/yourusername/LiveSpeechTrans.git
+   git clone https://github.com/lijianfeigeek/LiveSpeechTrans.git
    ```
 
    2. 使用 Xcode 打开 LiveSpeechTrans.xcodeproj
