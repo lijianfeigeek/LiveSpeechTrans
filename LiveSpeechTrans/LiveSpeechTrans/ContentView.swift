@@ -11,10 +11,46 @@ import AVFoundation
 struct ContentView: View {
     @StateObject private var recordingManager = RecordingManager()
     @StateObject private var openAIManager = OpenAIManager(apiKey: "YOUR_API_KEY_HERE")
+    @State private var sidebarWidth: CGFloat = 200
+
     var body: some View {
-        ChatView(recordingManager: recordingManager, openAIManager: openAIManager)
+        NavigationSplitView {
+            SidebarView(recordingManager: recordingManager, openAIManager: openAIManager, width: $sidebarWidth)
+                .frame(width: sidebarWidth)
+        }detail: {
+            
+        }
     }
 }
+
+struct SidebarView: View {
+    @ObservedObject var recordingManager: RecordingManager
+    @ObservedObject var openAIManager: OpenAIManager
+    @Binding var width: CGFloat
+
+    var body: some View {
+        List {
+            NavigationLink(destination: ChatView(recordingManager: recordingManager, openAIManager: openAIManager), isActive: .constant(true)) {
+                HStack {
+                    Image(systemName: "mic.fill")
+                        .foregroundColor(.blue)
+
+                    Text("实时翻译")
+                }
+            }
+            NavigationLink(destination: SettingsView()) {
+                HStack {
+                    Image(systemName: "gear")
+                        .foregroundColor(.gray)
+
+                    Text("设置")
+                }
+            }
+        }
+    }
+}
+
+
 
 struct SettingsView: View {
     var body: some View {
@@ -33,3 +69,8 @@ struct SettingsView: View {
 }
 
 // End of file. No additional code.
+
+
+
+
+
