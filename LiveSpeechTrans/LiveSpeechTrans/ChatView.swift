@@ -61,7 +61,7 @@ struct ChatView: View {
                 .padding(.bottom, 20)
         }
         .onAppear {
-            checkVoiceAvailability()
+//            checkVoiceAvailability()
         }
         .onReceive(recordingManager.$finalText) { newText in
             print("Received final text: \(newText)")
