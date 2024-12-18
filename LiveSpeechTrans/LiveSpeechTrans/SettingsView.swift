@@ -38,10 +38,13 @@ struct SettingsView: View {
             }
             Section(header: Text("TTS语音")) {
                 Picker("选择TTS语音", selection: $selectedTTSVoiceIdentifier) {
-                    ForEach(availableVoices, id: \.identifier) { voice in
-                        Text("\(voice.identifier) - \(voice.language) (\(voice.quality.rawValue))") // Display combined information
-                                                .tag(voice.identifier)
+                    ForEach(availableVoices.filter { voice in
+                        voice.language == "en-US" || voice.language == "zh-CN"
+                    }, id: \.identifier) { voice in
+                        Text("\(voice.identifier) - \(voice.language) (\(voice.quality.rawValue))")
+                            .tag(voice.identifier)
                     }
+
                 }
             }
             Section(header: Text("翻译 AI 设置（OpenAI接口风格）")) {

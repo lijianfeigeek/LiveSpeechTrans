@@ -24,13 +24,8 @@ class RecordingManager: ObservableObject {
     @AppStorage("selectedLanguage") private var selectedLanguageIdentifier = "zh-CN" // Default to Chinese
 
     init() {
-        setupAudioSession()
         requestSpeechAuthorization()
         updateSpeechRecognizer()
-    }
-    
-    private func setupAudioSession() {
-        // 设置音频会话
     }
     
     private func requestSpeechAuthorization() {
