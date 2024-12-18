@@ -33,6 +33,19 @@ struct ChatView: View {
         return AVSpeechSynthesisVoice(language: "en-US")
     }
 
+    private func speakTranslation(_ text: String) {
+        let utterance = AVSpeechUtterance(string: text)
+        if let preferredVoice = getPreferredVoice() {
+            utterance.voice = preferredVoice
+            utterance.rate = 0.5
+            utterance.volume = 1.0
+            
+            print("Starting speech synthesis...")
+            Self.speechSynthesizer.speak(utterance)
+            print("Speech synthesis initiated")
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             ScrollViewReader { proxy in
@@ -87,17 +100,7 @@ struct ChatView: View {
                     timestamp: lastMessage.timestamp
                 )
                 messages[messages.count - 1] = updatedMessage
-                
-                let utterance = AVSpeechUtterance(string: translation)
-                if let preferredVoice = getPreferredVoice() {
-                    utterance.voice = preferredVoice
-                    utterance.rate = 0.5  // 降低语速
-                    utterance.volume = 1.0 // 确保音量最大
-                    
-                    print("Starting speech synthesis...")
-                    Self.speechSynthesizer.speak(utterance)
-                    print("Speech synthesis initiated")
-                }
+                speakTranslation(translation)
             }
         }
         .onDisappear {
@@ -108,47 +111,70 @@ struct ChatView: View {
     }
 }
 
-#if DEBUG
-extension ChatView {
-    private func listAvailableVoices() {
-//        let voices = AVSpeechSynthesisVoice.speechVoices()
-//        print("Available voices:")
-//        for voice in voices {
-//            print("- \(voice.identifier): \(voice.language)")
-//        }
-    }
-
-    func checkVoiceAvailability() {
-        // Check for premium voice
-//        if let premiumVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe") {
-//            print("Premium voice is available: \(premiumVoice.identifier)")
-//            print("Quality: \(premiumVoice.quality.rawValue)")
-//        } else {
-//            print("Premium voice is not available")
-//        }
-        
-        // List all available voices
-        let voices = AVSpeechSynthesisVoice.speechVoices()
-        print("\nAll available voices:")
-        for voice in voices {
-            print("ID: \(voice.identifier)")
-            print("Language: \(voice.language)")
-            print("Quality: \(voice.quality.rawValue)")
-            print("---")
-        }
-    }
-}
-#endif
-
 struct MessageBubble: View {
     let message: ChatMessage
+    private static let speechSynthesizer = AVSpeechSynthesizer()
+    @AppStorage("selectedTTSVoice") private var selectedTTSVoiceIdentifier = "com.apple.voice.enhanced.en-US.Evan"
+    @State private var isPlaying = false
+    
+    // Store delegate as a property
+    private let speechDelegate: SpeechDelegate
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
         return formatter
     }()
+    
+    private class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
+        private var isPlayingBinding: Binding<Bool>
+        
+        init(isPlaying: Binding<Bool>) {
+            self.isPlayingBinding = isPlaying
+            super.init()
+        }
+        
+        func updateBinding(_ newBinding: Binding<Bool>) {
+            self.isPlayingBinding = newBinding
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
+            DispatchQueue.main.async {
+                self.isPlayingBinding.wrappedValue = true
+            }
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+            DispatchQueue.main.async {
+                self.isPlayingBinding.wrappedValue = false
+            }
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
+            DispatchQueue.main.async {
+                self.isPlayingBinding.wrappedValue = false
+            }
+        }
+        
+        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+            DispatchQueue.main.async {
+                self.isPlayingBinding.wrappedValue = false
+            }
+        }
+    }
+    
+    init(message: ChatMessage) {
+        self.message = message
+        // Initialize delegate with a temporary binding
+        let isPlayingBinding = Binding<Bool>(
+            get: { false },
+            set: { _ in }
+        )
+        self.speechDelegate = SpeechDelegate(isPlaying: isPlayingBinding)
+        // Set the delegate
+        MessageBubble.speechSynthesizer.delegate = self.speechDelegate
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -164,13 +190,50 @@ struct MessageBubble: View {
                 .cornerRadius(16)
             
             if !message.translation.isEmpty {
-                Text(message.translation)
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 8)
+                HStack {
+                    Text(message.translation)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: 24, height: 24)
+                        .overlay(
+                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 12, height: 12)
+                                .foregroundColor(.white)
+                        )
+                        .onTapGesture {
+                            if isPlaying {
+                                Self.speechSynthesizer.pauseSpeaking(at: .immediate)
+                                isPlaying = false
+                            } else {
+                                if Self.speechSynthesizer.isPaused {
+                                    Self.speechSynthesizer.continueSpeaking()
+                                    isPlaying = true
+                                } else {
+                                    let utterance = AVSpeechUtterance(string: message.translation)
+                                    if let voice = AVSpeechSynthesisVoice(identifier: selectedTTSVoiceIdentifier) {
+                                        utterance.voice = voice
+                                        utterance.rate = 0.5
+                                        utterance.volume = 1.0
+                                        Self.speechSynthesizer.speak(utterance)
+                                        isPlaying = true
+                                    }
+                                }
+                            }
+                        }
+                }
+                .padding(.horizontal, 8)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear {
+            // Update delegate's binding when view appears
+            speechDelegate.updateBinding($isPlaying)
+        }
     }
 }
 
