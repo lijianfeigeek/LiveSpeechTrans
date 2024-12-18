@@ -37,7 +37,7 @@ struct SettingsView: View {
                 }
             }
             Section(header: Text("TTS语音")) {
-                Picker("选择TTS语音", selection: $selectedTTSVoiceIdentifier) {
+                Picker("选择TTS语音(id-language-quality)", selection: $selectedTTSVoiceIdentifier) {
                     ForEach(availableVoices.filter { voice in
                         voice.language == "en-US" || voice.language == "zh-CN"
                     }, id: \.identifier) { voice in
@@ -47,7 +47,7 @@ struct SettingsView: View {
 
                 }
             }
-            Section(header: Text("翻译 AI 设置（OpenAI接口风格）")) {
+            Section(header: Text("翻译 AI 设置( OpenAI 接口风格)")) {
                 HStack {
                     TextField("URL", text: $aiBaseUrl)
                 }
