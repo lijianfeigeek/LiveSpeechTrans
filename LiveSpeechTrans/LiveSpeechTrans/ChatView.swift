@@ -199,10 +199,10 @@ struct MessageBubble: View {
                         .fill(Color.blue)
                         .frame(width: 24, height: 24)
                         .overlay(
-                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                            Image(systemName: isPlaying ? "pause.fill" : "arrow.clockwise")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 12, height: 12)
+                                .frame(width: 10, height: 10)
                                 .foregroundColor(.white)
                         )
                         .onTapGesture {
