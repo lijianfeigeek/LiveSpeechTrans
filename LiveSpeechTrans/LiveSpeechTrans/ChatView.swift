@@ -22,10 +22,11 @@ struct ChatView: View {
     private static let speechSynthesizer = AVSpeechSynthesizer()
     
     @AppStorage("selectedLanguage") private var selectedLanguageIdentifier = "zh-CN" // Default to Chinese
-    @AppStorage("selectedTranslationLanguage") private var selectedTranslationLanguageIdentifier = "English" // Default to English
+    @AppStorage("selectedTranslationLanguage") private var selectedTranslationLanguageIdentifier = "English" // Default to Englis
+    @AppStorage("selectedTTSVoice") private var selectedTTSVoiceIdentifier = "com.apple.voice.enhanced.en-US.Evan" // Default to empty string
 
     private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
-        if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.enhanced.en-US.Evan") {
+        if let fredVoice = AVSpeechSynthesisVoice(identifier: selectedTTSVoiceIdentifier) {
             return fredVoice
         }
         
