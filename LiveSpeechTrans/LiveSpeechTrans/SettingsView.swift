@@ -10,11 +10,12 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("selectedLanguage") private var selectedLanguageIdentifier = "zh-CN" // Default to Chinese
     @AppStorage("selectedTranslationLanguage") private var selectedTranslationLanguageIdentifier = "English" // Default to English
-    
+    @AppStorage("aiBaseUrl") private var aiBaseUrl = "http://192.168.0.111:1234" // 默认基本 URL
+    @AppStorage("APIKey") private var APIKey = ""
     var body: some View {
         Form {
             Section(header: Text("语言选择")) {
-                Picker("语音识别语言", selection: $selectedLanguageIdentifier) {
+                Picker("麦克风识别语言", selection: $selectedLanguageIdentifier) {
                     Text("English (US)")
                         .tag("en-US")
                     Text("Chinese (Simplified)")
@@ -30,8 +31,12 @@ struct SettingsView: View {
                     // Add more languages here as needed
                 }
             }
-            
-            // ... other settings ...
+            Section(header: Text("翻译 AI 设置（OpenAI接口风格）")) {
+                HStack {
+                    TextField("URL", text: $aiBaseUrl)
+                }
+                TextField("APIKey(本地模型可为空)", text: $APIKey)
+            }
         }
         .formStyle(.grouped)
     }

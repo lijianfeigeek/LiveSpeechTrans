@@ -10,7 +10,7 @@ import AVFoundation
 
 struct ContentView: View {
     @StateObject private var recordingManager = RecordingManager()
-    @StateObject private var openAIManager = OpenAIManager(apiKey: "YOUR_API_KEY_HERE")
+    @StateObject private var openAIManager = OpenAIManager()
     @State private var sidebarWidth: CGFloat = 200
 
     var body: some View {

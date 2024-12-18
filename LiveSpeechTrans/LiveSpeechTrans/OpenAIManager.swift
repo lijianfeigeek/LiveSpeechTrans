@@ -1,19 +1,17 @@
 import Foundation
 import os.log
+import SwiftUI
 
 class OpenAIManager: ObservableObject {
-    private let apiKey: String
-    private let baseURL = "http://192.168.0.111:1234/v1/chat/completions"
-    
+    @AppStorage("APIKey") private var APIKey = ""
+//    private let baseURL = "http://192.168.0.111:1234/v1/chat/completions"
+    @AppStorage("aiBaseUrl") private var aiBaseUrl = "http://192.168.0.111:1234" // 默认基本 URL
+
     @Published var translation: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
     private let logger = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "OpenAIManager")
-    
-    init(apiKey: String) {
-        self.apiKey = apiKey
-    }
     
     func translate(text: String, from: String, to: String) {
         guard !text.isEmpty else {
@@ -40,22 +38,22 @@ class OpenAIManager: ObservableObject {
             return
         }
         
-        guard let url = URL(string: baseURL) else {
+        guard let url = URL(string: aiBaseUrl+"/v1/chat/completions") else {
             DispatchQueue.main.async {
                 self.errorMessage = "Invalid URL"
                 self.isLoading = false
             }
-            os_log("Invalid URL: %{public}@", log: logger, type: .error, baseURL)
+            os_log("Invalid URL: %{public}@", log: logger, type: .error, aiBaseUrl+"/v1/chat/completions")
             return
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(APIKey)", forHTTPHeaderField: "Authorization")
         request.httpBody = jsonData
         
-        os_log("Sending request to %{public}@", log: logger, type: .debug, baseURL)
+        os_log("Sending request to %{public}@", log: logger, type: .debug, aiBaseUrl+"/v1/chat/completions")
         
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
