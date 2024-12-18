@@ -21,6 +21,9 @@ struct ChatView: View {
     // Make synthesizer static to prevent deallocation
     private static let speechSynthesizer = AVSpeechSynthesizer()
     
+    @AppStorage("selectedLanguage") private var selectedLanguageIdentifier = "zh-CN" // Default to Chinese
+    @AppStorage("selectedTranslationLanguage") private var selectedTranslationLanguageIdentifier = "English" // Default to English
+
     private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
         if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.enhanced.en-US.Evan") {
             return fredVoice
@@ -70,7 +73,7 @@ struct ChatView: View {
                     timestamp: Date()
                 )
                 messages.append(newMessage)
-                openAIManager.translate(text: newText, from: "Chinese", to: "English")
+                openAIManager.translate(text: newText, from: selectedLanguageIdentifier, to: selectedTranslationLanguageIdentifier)
             }
         }
         .onReceive(openAIManager.$translation) { translation in

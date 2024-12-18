@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 import Combine
 import Speech
+import SwiftUI
 
 class RecordingManager: ObservableObject {
     private var audioEngine: AVAudioEngine?
@@ -20,6 +21,8 @@ class RecordingManager: ObservableObject {
     private let silenceDuration: TimeInterval = 1.5  // 停顿持续时间（秒）
     private var lastAudioLevel: Float = 0
     
+    @AppStorage("selectedLanguage") private var selectedLanguageIdentifier = "zh-CN" // Default to Chinese
+
     init() {
         setupAudioSession()
         requestSpeechAuthorization()
@@ -50,10 +53,9 @@ class RecordingManager: ObservableObject {
     }
     
     private func updateSpeechRecognizer() {
-        // 设置为中文识别
-        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "zh-CN"))
+        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: selectedLanguageIdentifier))
         if speechRecognizer == nil {
-            errorMessage = "Speech recognition not available for Chinese."
+            errorMessage = "Speech recognition not available for \(selectedLanguageIdentifier)."
         } else {
             errorMessage = nil
         }
@@ -194,3 +196,4 @@ class RecordingManager: ObservableObject {
         print("Recording stopped")
     }
 }
+
