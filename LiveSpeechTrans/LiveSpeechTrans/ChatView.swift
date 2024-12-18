@@ -196,3 +196,8 @@ struct RecordingButton: View {
     }
 }
 
+#Preview {
+    var recordingManager = RecordingManager()
+    var openAIManager = OpenAIManager(apiKey: "YOUR_API_KEY_HERE")
+    ChatView(recordingManager: recordingManager, openAIManager: openAIManager)
+}
