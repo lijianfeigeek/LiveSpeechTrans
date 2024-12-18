@@ -21,16 +21,6 @@ struct ChatView: View {
     // Make synthesizer static to prevent deallocation
     private static let speechSynthesizer = AVSpeechSynthesizer()
     
-    // Add audio session configuration
-    private func configureAudioSession() {
-//        do {
-//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-//            try AVAudioSession.sharedInstance().setActive(true)
-//        } catch {
-//            print("Audio session configuration error: \(error)")
-//        }
-    }
-    
     private func getPreferredVoice() -> AVSpeechSynthesisVoice? {
         if let fredVoice = AVSpeechSynthesisVoice(identifier: "com.apple.voice.enhanced.en-US.Evan") {
             return fredVoice
@@ -69,14 +59,13 @@ struct ChatView: View {
         }
         .onAppear {
             checkVoiceAvailability()
-            configureAudioSession()
         }
         .onReceive(recordingManager.$finalText) { newText in
             print("Received final text: \(newText)")
             if !newText.isEmpty {
                 let newMessage = ChatMessage(
-                    text: newText, 
-                    translation: "", 
+                    text: newText,
+                    translation: "",
                     isUser: true,
                     timestamp: Date()
                 )
@@ -88,8 +77,8 @@ struct ChatView: View {
             print("Received translation: \(translation)")
             if let lastMessage = messages.last, lastMessage.isUser {
                 let updatedMessage = ChatMessage(
-                    text: lastMessage.text, 
-                    translation: translation, 
+                    text: lastMessage.text,
+                    translation: translation,
                     isUser: true,
                     timestamp: lastMessage.timestamp
                 )
@@ -106,6 +95,11 @@ struct ChatView: View {
                     print("Speech synthesis initiated")
                 }
             }
+        }
+        .onDisappear {
+            messages.removeAll()
+            recordingManager.finalText = ""
+            recordingManager.stopRecording()
         }
     }
 }
@@ -201,3 +195,4 @@ struct RecordingButton: View {
             }
     }
 }
+
